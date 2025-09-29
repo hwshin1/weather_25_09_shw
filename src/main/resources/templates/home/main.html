@@ -5,47 +5,81 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>현재 날씨 조회</title>
 </head>
-<body class="min-h-screen bg-gradient-to-b from-sky-50 to-white text-gray-800">
+<body>
 
-<header class="sticky top-0 z-10 bg-white/80 backdrop-blur border-b border-gray-200">
-    <div class="max-w-3xl mx-auto px-4 py-4">
-        <h1 class="text-2xl font-bold tracking-tight">현재 날씨 조회</h1>
+<!-- 카카오맵 SDK: autoload=false 이므로 kakao.maps.load(...) 필수 -->
+<script type="text/javascript"
+        src="//dapi.kakao.com/v2/maps/sdk.js?appkey=69544617df3febfc879cd18eed451ba3&libraries=services&autoload=false"></script>
+
+<!-- 지도 영역 -->
+<div id="map" class="w-full h-screen"></div>
+
+<!-- 좌측 패널 -->
+<aside class="absolute top-[100px] left-[40px] z-20 w-[420px] bg-white/90 backdrop-blur rounded-2xl border border-gray-200 shadow-2xl overflow-hidden">
+
+    <!-- 패널 헤더 : 제목 + 메트릭 탭 -->
+    <header class="sticky top-0 bg-gradient-to-r from-indigo-600 to-indigo-500 text-white px-6 py-5">
+        <!-- 제목 -->
+        <h2 class="text-xl font-extrabold tracking-tight">현재 날씨 조회</h2>
+        <!-- 부제(선택된 행정동 라벨) -->
+        <p id="emdName" class="mt-1 text-sm/6 text-indigo-100">도시를 검색해 주세요</p>
+    </header>
+
+    <!-- 본문 컨테이너 -->
+    <div class="p-6 space-y-6">
+
+        <!-- 영역 선택 섹션 : 셀렉트 3종 -->
+        <section class="rounded-xl border border-gray-100 bg-white shadow-sm p-4">
+            <!-- 섹션 제목 -->
+            <div class="flex flex-col items-center justify-between mb-3">
+                <h3 class="text-sm font-semibold text-gray-800">도시 검색</h3>
+
+                <form action="/weather/main" method="get" class="flex gap-2 mb-4">
+                    <input type="text" name="city" placeholder="예) 서울" class="border px-3 py-2 rounded flex-1" required />
+                    <button type="submit" class="bg-sky-600 text-white px-4 rounded">조회</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- 메트릭 카드 : 날씨정보 -->
+        <section id="card-floating"
+                 class="rounded-xl border border-gray-100 bg-gradient-to-b from-white to-indigo-50/60
+                    shadow-sm p-4">
+            <!-- 카드 헤더 -->
+            <div th:if="${weather != null}" class="border rounded p-4 space-y-2">
+                <div class="text-gray-600 text-sm">
+                    지역: <span th:text="${city}"></span>
+                    (<span th:text="${regId}"></span>) · 업데이트: <span th:text="${weather.announceTime}"></span>
+                </div>
+                <div class="grid grid-cols-3 gap-3">
+                    <div class="border rounded p-3">
+                        <div class="text-xs text-gray-500">온도</div>
+                        <div class="text-xl font-semibold" th:text="${#strings.isEmpty(weather.temperature) ? '-' : weather.temperature + ' ℃'}"></div>
+                    </div>
+                    <div class="border rounded p-3">
+                        <div class="text-xs text-gray-500">강수확률(습도)</div>
+                        <div class="text-xl font-semibold" th:text="${#strings.isEmpty(weather.rnSt) ? '-' : weather.rnSt + ' %'}"></div>
+                    </div>
+                    <div class="border rounded p-3">
+                        <div class="text-xs text-gray-500">풍향</div>
+                        <div class="text-xl font-semibold" th:text="${weather.wd1}"></div>
+                    </div>
+                </div>
+                <div class="text-gray-700" th:text="${weather.wf}"></div>
+            </div>
+
+            <div th:if="${error != null}" class="text-red-600" th:text="${error}">에러</div>
+        </section>
+
+        <!-- 도움말 -->
+        <p class="text-[12px] text-gray-500">
+            검색창에서 도시를 입력하세요.
+        </p>
     </div>
-</header>
+</aside>
 
-<main class="max-w-3xl mx-auto px-4 py-8 space-y-6">
-    <section class="rounded-2xl border border-gray-200 bg-white shadow-sm p-5">
-
-        <form action="/weather/main" method="get" class="flex gap-2 mb-4">
-            <input type="text" name="city" placeholder="예) 서울" class="border px-3 py-2 rounded flex-1" required />
-            <button type="submit" class="bg-sky-600 text-white px-4 rounded">조회</button>
-        </form>
-
-        <div th:if="${weather != null}" class="border rounded p-4 space-y-2">
-            <div class="text-gray-600 text-sm">
-                지역: <span th:text="${city}"></span>
-                (<span th:text="${regId}"></span>) · 업데이트: <span th:text="${weather.announceTime}"></span>
-            </div>
-            <div class="grid grid-cols-3 gap-3">
-                <div class="border rounded p-3">
-                    <div class="text-xs text-gray-500">온도</div>
-                    <div class="text-xl font-semibold" th:text="${#strings.isEmpty(weather.temperature) ? '-' : weather.temperature + ' ℃'}"></div>
-                </div>
-                <div class="border rounded p-3">
-                    <div class="text-xs text-gray-500">강수확률(습도 자리)</div>
-                    <div class="text-xl font-semibold" th:text="${#strings.isEmpty(weather.rnSt) ? '-' : weather.rnSt + ' %'}"></div>
-                </div>
-                <div class="border rounded p-3">
-                    <div class="text-xs text-gray-500">풍향</div>
-                    <div class="text-xl font-semibold" th:text="${weather.wd1}"></div>
-                </div>
-            </div>
-            <div class="text-gray-700" th:text="${weather.wf}"></div>
-        </div>
-
-        <div th:if="${error != null}" class="text-red-600" th:text="${error}">에러</div>
-    </section>
-</main>
+<!-- 지도/업종 스크립트 -->
+<script type="text/javascript" th:src="@{/js/commercialZoneMap.js}"></script>
 
 </body>
 </html>
