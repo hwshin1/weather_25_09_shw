@@ -1,0 +1,42 @@
+server:
+  port: 8080
+spring:
+  thymeleaf:
+    cache: false
+    prefix: classpath:/templates/
+    suffix: .html
+    mode: HTML
+    encoding: UTF-8
+  devtools:
+    livereload:
+      enabled: true
+    restart:
+      enabled: true
+  datasource:
+    url: jdbc:mysql://localhost:3306/weather_09?useUnicode=true&characterEncoding=utf8&autoReconnect=true&serverTimezone=Asia/Seoul
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: 1234
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
+
+    open-in-view: false
+  profiles:
+    active: dev
+  main:
+    allow-bean-definition-overriding: true
+logging:
+  level:
+    org.example.weather_25_09_shw: debug
+    org.hibernate.sql: debug
+    org.hibernate.orm.deprecation: error
+
+# kmaApiHub (??? API)
+kma:
+  apiKey: kqjtlL2ZTNCo7ZS9mdzQ3A

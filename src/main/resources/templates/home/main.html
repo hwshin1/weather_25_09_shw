@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="common/head :: head">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>현재 날씨 조회</title>
+</head>
+<body class="min-h-screen bg-gradient-to-b from-sky-50 to-white text-gray-800">
+
+<header class="sticky top-0 z-10 bg-white/80 backdrop-blur border-b border-gray-200">
+    <div class="max-w-3xl mx-auto px-4 py-4">
+        <h1 class="text-2xl font-bold tracking-tight">현재 날씨 조회</h1>
+    </div>
+</header>
+
+<main class="max-w-3xl mx-auto px-4 py-8 space-y-6">
+    <section class="rounded-2xl border border-gray-200 bg-white shadow-sm p-5">
+
+        <form action="/weather/main" method="get" class="flex gap-2 mb-4">
+            <input type="text" name="city" placeholder="예) 서울" class="border px-3 py-2 rounded flex-1" required />
+            <button type="submit" class="bg-sky-600 text-white px-4 rounded">조회</button>
+        </form>
+
+        <div th:if="${weather != null}" class="border rounded p-4 space-y-2">
+            <div class="text-gray-600 text-sm">
+                지역: <span th:text="${city}"></span>
+                (<span th:text="${regId}"></span>) · 업데이트: <span th:text="${weather.announceTime}"></span>
+            </div>
+            <div class="grid grid-cols-3 gap-3">
+                <div class="border rounded p-3">
+                    <div class="text-xs text-gray-500">온도</div>
+                    <div class="text-xl font-semibold" th:text="${#strings.isEmpty(weather.temperature) ? '-' : weather.temperature + ' ℃'}"></div>
+                </div>
+                <div class="border rounded p-3">
+                    <div class="text-xs text-gray-500">강수확률(습도 자리)</div>
+                    <div class="text-xl font-semibold" th:text="${#strings.isEmpty(weather.rnSt) ? '-' : weather.rnSt + ' %'}"></div>
+                </div>
+                <div class="border rounded p-3">
+                    <div class="text-xs text-gray-500">풍향</div>
+                    <div class="text-xl font-semibold" th:text="${weather.wd1}"></div>
+                </div>
+            </div>
+            <div class="text-gray-700" th:text="${weather.wf}"></div>
+        </div>
+
+        <div th:if="${error != null}" class="text-red-600" th:text="${error}">에러</div>
+    </section>
+</main>
+
+</body>
+</html>
